@@ -23,13 +23,13 @@ Ports of the trained weights of all the original models are provided below. This
 The main goal of this project is to create an SSD implementation that is well documented for those who are interested in a low-level understanding of the model. The provided tutorials, documentation and detailed comments hopefully make it a bit easier to dig into the code and adapt or build upon the model than with most other implementations out there (Keras or otherwise) that provide little to no documentation and comments.
 
 The repository currently provides the following network architectures:
-* SSD300: [`keras_ssd300.py`](models/keras_ssd300.py)
-* SSD512: [`keras_ssd512.py`](models/keras_ssd512.py)
-* SSD7: [`keras_ssd7.py`](models/keras_ssd7.py) - a smaller 7-layer version that can be trained from scratch relatively quickly even on a mid-tier GPU, yet is capable enough for less complex object detection tasks and testing. You're obviously not going to get state-of-the-art results with that one, but it's fast.
+* SSD300: [`keras_ssd300.py`](ssd_keras/models/keras_ssd300.py)
+* SSD512: [`keras_ssd512.py`](ssd_keras/models/keras_ssd512.py)
+* SSD7: [`keras_ssd7.py`](ssd_keras/models/keras_ssd7.py) - a smaller 7-layer version that can be trained from scratch relatively quickly even on a mid-tier GPU, yet is capable enough for less complex object detection tasks and testing. You're obviously not going to get state-of-the-art results with that one, but it's fast.
 
 If you would like to use one of the provided trained models for transfer learning (i.e. fine-tune one of the trained models on your own dataset), there is a [Jupyter notebook tutorial](weight_sampling_tutorial.ipynb) that helps you sub-sample the trained weights so that they are compatible with your dataset, see further below.
 
-If you would like to build an SSD with your own base network architecture, you can use [`keras_ssd7.py`](models/keras_ssd7.py) as a template, it provides documentation and comments to help you.
+If you would like to build an SSD with your own base network architecture, you can use [`keras_ssd7.py`](ssd_keras/models/keras_ssd7.py) as a template, it provides documentation and comments to help you.
 
 ### Performance
 
@@ -130,15 +130,15 @@ Below are some prediction examples of the fully trained original SSD300 "07+12" 
 
 | | |
 |---|---|
-| ![img01](./examples/trained_ssd300_pascalVOC2007_test_pred_05_no_gt.png) | ![img01](./examples/trained_ssd300_pascalVOC2007_test_pred_04_no_gt.png) |
-| ![img01](./examples/trained_ssd300_pascalVOC2007_test_pred_01_no_gt.png) | ![img01](./examples/trained_ssd300_pascalVOC2007_test_pred_02_no_gt.png) |
+| ![img01](ssd_keras/examples/trained_ssd300_pascalVOC2007_test_pred_05_no_gt.png) | ![img01](ssd_keras/examples/trained_ssd300_pascalVOC2007_test_pred_04_no_gt.png) |
+| ![img01](ssd_keras/examples/trained_ssd300_pascalVOC2007_test_pred_01_no_gt.png) | ![img01](ssd_keras/examples/trained_ssd300_pascalVOC2007_test_pred_02_no_gt.png) |
 
 Here are some prediction examples of an SSD7 (i.e. the small 7-layer version) partially trained on two road traffic datasets released by [Udacity](https://github.com/udacity/self-driving-car/tree/master/annotations) with roughly 20,000 images in total and 5 object categories (more info in [`ssd7_training.ipynb`](ssd7_training.ipynb)). The predictions you see below were made after 10,000 training steps at batch size 32. Admittedly, cars are comparatively easy objects to detect and I picked a few of the better examples, but it is nonetheless remarkable what such a small model can do after only 10,000 training iterations.
 
 | | |
 |---|---|
-| ![img01](./examples/ssd7_udacity_traffic_pred_01.png) | ![img01](./examples/ssd7_udacity_traffic_pred_02.png) |
-| ![img01](./examples/ssd7_udacity_traffic_pred_03.png) | ![img01](./examples/ssd7_udacity_traffic_pred_04.png) |
+| ![img01](ssd_keras/examples/ssd7_udacity_traffic_pred_01.png) | ![img01](ssd_keras/examples/ssd7_udacity_traffic_pred_02.png) |
+| ![img01](ssd_keras/examples/ssd7_udacity_traffic_pred_03.png) | ![img01](ssd_keras/examples/ssd7_udacity_traffic_pred_04.png) |
 
 ### Dependencies
 
@@ -196,7 +196,7 @@ The procedure for training SSD512 is the same of course. It is imperative that y
 
 #### Encoding and decoding boxes
 
-The [`ssd_encoder_decoder`](ssd_encoder_decoder) sub-package contains all functions and classes related to encoding and decoding boxes. Encoding boxes means converting ground truth labels into the target format that the loss function needs during training. It is this encoding process in which the matching of ground truth boxes to anchor boxes (the paper calls them default boxes and in the original C++ code they are called priors - all the same thing) happens. Decoding boxes means converting raw model output back to the input label format, which entails various conversion and filtering processes such as non-maximum suppression (NMS).
+The [`ssd_encoder_decoder`](ssd_keras/ssd_encoder_decoder) sub-package contains all functions and classes related to encoding and decoding boxes. Encoding boxes means converting ground truth labels into the target format that the loss function needs during training. It is this encoding process in which the matching of ground truth boxes to anchor boxes (the paper calls them default boxes and in the original C++ code they are called priors - all the same thing) happens. Decoding boxes means converting raw model output back to the input label format, which entails various conversion and filtering processes such as non-maximum suppression (NMS).
 
 In order to train the model, you need to create an instance of `SSDInputEncoder` that needs to be passed to the data generator. The data generator does the rest, so you don't usually need to call any of `SSDInputEncoder`'s methods manually.
 
@@ -206,7 +206,7 @@ A note on the anchor box offset coordinates used internally by the model: This m
 
 #### Using a different base network architecture
 
-If you want to build a different base network architecture, you could use [`keras_ssd7.py`](models/keras_ssd7.py) as a template. It provides documentation and comments to help you turn it into a different base network. Put together the base network you want and add a predictor layer on top of each network layer from which you would like to make predictions. Create two predictor heads for each, one for localization, one for classification. Create an anchor box layer for each predictor layer and set the respective localization head's output as the input for the anchor box layer. The structure of all tensor reshaping and concatenation operations remains the same, you just have to make sure to include all of your predictor and anchor box layers of course.
+If you want to build a different base network architecture, you could use [`keras_ssd7.py`](ssd_keras/models/keras_ssd7.py) as a template. It provides documentation and comments to help you turn it into a different base network. Put together the base network you want and add a predictor layer on top of each network layer from which you would like to make predictions. Create two predictor heads for each, one for localization, one for classification. Create an anchor box layer for each predictor layer and set the respective localization head's output as the input for the anchor box layer. The structure of all tensor reshaping and concatenation operations remains the same, you just have to make sure to include all of your predictor and anchor box layers of course.
 
 ### Download the convolutionalized VGG-16 weights
 

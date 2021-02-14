@@ -1,18 +1,17 @@
 import h5py
 import numpy as np
 import shutil
-
-from misc_utils.tensor_sampling_utils import sample_tensors
+import sys
+sys.path.append('detectors/primary_detector/ssd_keras')
+from ssd_keras.misc_utils import sample_tensors
 
 
 # TODO: Set the path for the source weights file you want to load.
 
-weights_source_path = 'weights/VGG_coco_SSD_512x512_iter_360000.h5'
-
+weights_source_path = 'weights/primary_detector/ssd_keras/VGG_coco_SSD_512x512_iter_360000.h5'
 # TODO: Set the path and name for the destination weights file
 #       that you want to create.
-
-weights_destination_path = 'weights/VGG_coco_SSD_512x512_iter_360000_4_classes.h5'
+weights_destination_path = 'weights/primary_detector/ssd_keras/VGG_coco_SSD_512x512_iter_360000_4_classes.h5'
 
 # Make a copy of the weights file.
 shutil.copy(weights_source_path, weights_destination_path)

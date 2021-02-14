@@ -6,23 +6,22 @@ from keras import backend as K
 from keras.models import load_model
 from keras.preprocessing import image
 from keras.optimizers import Adam
-from imageio import imread
 import numpy as np
-from matplotlib import pyplot as plt
+import sys
+import ssd_keras.bounding_box_utils.bounding_box_utils
+from ssd_keras.models.keras_ssd512 import ssd_512
+from ssd_keras.keras_loss_function.keras_ssd_loss import SSDLoss
+from ssd_keras.keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
+from ssd_keras.keras_layers.keras_layer_DecodeDetections import DecodeDetections
+from ssd_keras.keras_layers.keras_layer_DecodeDetectionsFast import DecodeDetectionsFast
+from ssd_keras.keras_layers.keras_layer_L2Normalization import L2Normalization
 
-from models.keras_ssd512 import ssd_512
-from keras_loss_function.keras_ssd_loss import SSDLoss
-from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
-from keras_layers.keras_layer_DecodeDetections import DecodeDetections
-from keras_layers.keras_layer_DecodeDetectionsFast import DecodeDetectionsFast
-from keras_layers.keras_layer_L2Normalization import L2Normalization
+from ssd_keras.ssd_encoder_decoder.ssd_output_decoder import decode_detections, decode_detections_fast
 
-from ssd_encoder_decoder.ssd_output_decoder import decode_detections, decode_detections_fast
-
-from data_generator.object_detection_2d_data_generator import DataGenerator
-from data_generator.object_detection_2d_photometric_ops import ConvertTo3Channels
-from data_generator.object_detection_2d_geometric_ops import Resize
-from data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
+from ssd_keras.data_generator.object_detection_2d_data_generator import DataGenerator
+from ssd_keras.data_generator.object_detection_2d_photometric_ops import ConvertTo3Channels
+from ssd_keras.data_generator.object_detection_2d_geometric_ops import Resize
+from ssd_keras.data_generator.object_detection_2d_misc_utils import apply_inverse_transforms
 
 
 img_height = 512
@@ -89,7 +88,7 @@ model = ssd_512(image_size=(img_height, img_width, 3),
                top_k=200,
                nms_max_output_size=400)
 
-weights_path = 'weights/VGG_coco_SSD_512x512_iter_360000_4_classes.h5'
+weights_path = 'weights/primary_detector/ssd_keras/VGG_coco_SSD_512x512_iter_360000_4_classes.h5'
 
 model.load_weights(weights_path, by_name=True)
 
